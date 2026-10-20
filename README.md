@@ -27,11 +27,7 @@ GET /internal/v1/library/users/{userId}/games/{gameId}
 Resposta:
 
 ```json
-{
-  "userId": "11111111-1111-1111-1111-111111111111",
-  "gameId": "22222222-2222-2222-2222-222222222222",
-  "owned": true
-}
+true
 ```
 
 Esta e a consulta usada pelo Orders antes de iniciar uma nova compra.

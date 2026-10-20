@@ -13,11 +13,11 @@ public sealed class LibraryOwnershipController : ControllerBase
 {
     [Authorize(Policy = LibraryPolicies.OwnershipRead)]
     [HttpGet("{gameId:guid}")]
-    [ProducesResponseType(typeof(OwnershipResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<OwnershipResponse>> CheckAsync(
+    public async Task<ActionResult<bool>> CheckAsync(
         [FromRoute] Guid userId,
         [FromRoute] Guid gameId,
         [FromServices] CheckGameOwnershipService service,
@@ -28,9 +28,6 @@ public sealed class LibraryOwnershipController : ControllerBase
             gameId,
             cancellationToken);
 
-        return Ok(new OwnershipResponse(
-            result.UserId,
-            result.GameId,
-            result.Owned));
+        return Ok(result.Owned);
     }
 }
