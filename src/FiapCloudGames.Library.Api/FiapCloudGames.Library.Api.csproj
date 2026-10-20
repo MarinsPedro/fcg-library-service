@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="../FiapCloudGames.Library.Infrastructure/FiapCloudGames.Library.Infrastructure.csproj" />
+    <ProjectReference Include="../FiapCloudGames.Library.Presentation/FiapCloudGames.Library.Presentation.csproj" />
+    <ProjectReference Include="$(LocalBuildingBlocksProject)" Condition="'$(UseLocalBuildingBlocks)' == 'true'" />
+    <PackageReference Include="FiapCloudGames.BuildingBlocks" Condition="'$(UseLocalBuildingBlocks)' != 'true'" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../FiapCloudGames.Library.Application/FiapCloudGames.Library.Application.csproj" />
+    <ProjectReference Include="../FiapCloudGames.Library.Domain/FiapCloudGames.Library.Domain.csproj" />
+    <ProjectReference Include="$(LocalBuildingBlocksProject)" Condition="'$(UseLocalBuildingBlocks)' == 'true'" />
+    <PackageReference Include="FiapCloudGames.BuildingBlocks" Condition="'$(UseLocalBuildingBlocks)' != 'true'" />
+    <PackageReference Include="MassTransit.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="FiapCloudGames.Library.Migrations" />
+    <InternalsVisibleTo Include="FiapCloudGames.Library.Database.IntegrationTests" />
+  </ItemGroup>
+</Project>

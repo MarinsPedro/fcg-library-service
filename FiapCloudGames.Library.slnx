@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FiapCloudGames.Library.Api/FiapCloudGames.Library.Api.csproj" />
+    <Project Path="src/FiapCloudGames.Library.Application/FiapCloudGames.Library.Application.csproj" />
+    <Project Path="src/FiapCloudGames.Library.Contracts/FiapCloudGames.Library.Contracts.csproj" />
+    <Project Path="src/FiapCloudGames.Library.Domain/FiapCloudGames.Library.Domain.csproj" />
+    <Project Path="src/FiapCloudGames.Library.Infrastructure/FiapCloudGames.Library.Infrastructure.csproj" />
+    <Project Path="src/FiapCloudGames.Library.Migrations/FiapCloudGames.Library.Migrations.csproj" />
+    <Project Path="src/FiapCloudGames.Library.Presentation/FiapCloudGames.Library.Presentation.csproj" />
+    <Project Path="src/FiapCloudGames.Library.Worker/FiapCloudGames.Library.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FiapCloudGames.Library.ArchitectureTests/FiapCloudGames.Library.ArchitectureTests.csproj" />
+    <Project Path="tests/FiapCloudGames.Library.Database.IntegrationTests/FiapCloudGames.Library.Database.IntegrationTests.csproj" />
+    <Project Path="tests/FiapCloudGames.Library.IntegrationTests/FiapCloudGames.Library.IntegrationTests.csproj" />
+    <Project Path="tests/FiapCloudGames.Library.UnitTests/FiapCloudGames.Library.UnitTests.csproj" />
+  </Folder>
+</Solution>
