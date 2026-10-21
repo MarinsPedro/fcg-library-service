@@ -1,4 +1,5 @@
-using FiapCloudGames.Library.Domain.Entries;
+﻿using FiapCloudGames.Library.Domain.Entries;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace FiapCloudGames.Library.Database.IntegrationTests;
