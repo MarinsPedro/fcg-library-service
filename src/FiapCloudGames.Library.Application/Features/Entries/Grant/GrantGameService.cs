@@ -55,7 +55,7 @@ public sealed class GrantGameService(
             input.UserId,
             input.GameId,
             input.OrderId,
-            input.OccurredAtUtc);
+            input.GrantedAtUtc);
 
         await repository.AddAsync(entry, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

@@ -4,4 +4,4 @@ public sealed record GrantGameInput(
     Guid OrderId,
     Guid UserId,
     Guid GameId,
-    DateTimeOffset OccurredAtUtc);
+    DateTimeOffset GrantedAtUtc);

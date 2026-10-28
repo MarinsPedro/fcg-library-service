@@ -74,7 +74,7 @@ public sealed class ArchitectureRulesTests
     public void Check_Contracts_RemainIndependent()
     {
         AssertDoesNotReference(
-            typeof(FiapCloudGames.Library.Contracts.Events.OrderCompletedEvent).Assembly,
+            typeof(FiapCloudGames.Library.Contracts.Events.V1.GameGrantRequestedEventV1).Assembly,
             "Application",
             "Domain",
             "Infrastructure",

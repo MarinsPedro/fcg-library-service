@@ -44,32 +44,68 @@ A listagem usa cursor composto por `GrantedAtUtc + Id`, evitando paginacao por o
 
 Scope: `library.games.read`.
 
+
 ## Mensageria
 
-O Worker consome:
+O Library utiliza MassTransit com RabbitMQ e
+Entity Framework Consumer Outbox.
 
-```text
-OrderCompletedEvent
-```
+### Entrada — Solicitação de concessão
 
-Payload atual:
+Contrato: GameGrantRequestedEventV1
 
-```text
-OrderId
-UserId
-GameId
-OccurredAtUtc
-```
+Exchange: fcg.events
+Tipo: topic
+Routing key: library.game.grant.requested
+Fila: fcg.library.game-grant-requested
 
-Fila do consumer:
+Payload:
+- OrderId
+- UserId
+- GameId
+- OccurredAtUtc
 
-```text
-fcg.library.order-completed
-```
+O Worker recebe o evento e solicita a concessão
+do jogo ao GrantGameService.
 
-O consumer usa MassTransit com Entity Framework Consumer Outbox. Falhas tecnicas recebem retry antes de seguirem para a fila de erro gerenciada pelo MassTransit.
+### Saída — Jogo concedido
 
-> O contrato esta temporariamente em `FiapCloudGames.Library.Contracts`. Quando `Orders.Contracts` estiver publicado como contrato compartilhado do Orders, o Library deve referencia-lo em vez de manter uma copia propria.
+Contrato: GameGrantedEventV1
+
+Exchange: fcg.library.events
+Tipo: topic
+Routing key: library.game.granted
+
+Payload:
+- LibraryEntryId
+- OrderId
+- UserId
+- GameId
+- GrantedAtUtc
+
+Após a concessão, o Library publica a confirmação
+para que Orders possa concluir o pedido.
+
+### Versionamento
+
+Os contratos estão em:
+
+FiapCloudGames.Library.Contracts.Events.V1
+
+### Confiabilidade
+
+- Consumer Outbox com PostgreSQL
+- Controle de mensagens recebidas pelo MassTransit
+- Idempotência de negócio por OrderId
+- Unicidade de ownership por UserId e GameId
+- CorrelationId propagado quando disponível
+- Retry para falhas transitórias
+
+### Integração pendente
+
+Alinhar contratos, routing keys e bindings com Orders.
+Validar o fluxo com RabbitMQ e PostgreSQL.
+
 
 ## Persistencia
 
