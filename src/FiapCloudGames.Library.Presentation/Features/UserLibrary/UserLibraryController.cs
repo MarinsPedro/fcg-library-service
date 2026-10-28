@@ -1,4 +1,4 @@
-using FiapCloudGames.BuildingBlocks.Web;
+﻿using FiapCloudGames.BuildingBlocks.Web;
 using FiapCloudGames.Library.Application.Features.Entries.Get;
 using FiapCloudGames.Library.Application.Features.Entries.List;
 using FiapCloudGames.Library.Presentation.Authorization;
@@ -49,11 +49,7 @@ public sealed class UserLibraryController : ControllerBase
         [FromServices] GetLibraryEntryService service,
         CancellationToken cancellationToken)
     {
-        var result = await service.ExecuteAsync(entryId, cancellationToken);
-
-        if (result.UserId != userId)
-            return NotFound();
-
+        var result = await service.ExecuteAsync(entryId, userId, cancellationToken);
         return Ok(result.ToResponse());
     }
 }

@@ -1,4 +1,4 @@
-using FiapCloudGames.BuildingBlocks.Exceptions;
+﻿using FiapCloudGames.BuildingBlocks.Exceptions;
 using FiapCloudGames.Library.Domain.Entries;
 using Microsoft.Extensions.Logging;
 
@@ -9,13 +9,17 @@ public sealed class GetLibraryEntryService(
     ILogger<GetLibraryEntryService> logger)
 {
     public async Task<LibraryEntryResult> ExecuteAsync(
-        Guid id,
+        Guid entryId,
+        Guid userId,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Localizando entrada da biblioteca com id {Id}.", id);
+        logger.LogInformation("Localizando entrada da biblioteca com id {Id}.", entryId);
 
-        var entry = await repository.GetAsync(id, cancellationToken)
-            ?? throw AppException.NotFound("Entrada da biblioteca nao encontrada.");
+        var entry = await repository.GetAsync(entryId, cancellationToken)
+            ?? throw AppException.NotFound("Entrada da biblioteca não encontrada.");
+
+        if (entry.UserId != userId)
+            throw AppException.NotFound($"Entrada da biblioteca para o usuário {userId} não encontrada.");
 
         return LibraryApplicationMappings.ToResult(entry);
     }
