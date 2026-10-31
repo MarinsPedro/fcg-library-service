@@ -1,0 +1,62 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: library-api
+  namespace: fcg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-api
+  template:
+    metadata:
+      labels:
+        app: library-api
+    spec:
+      containers:
+        - name: library-api
+          image: fcg-library-api:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+
+            - name: ASPNETCORE_URLS
+              value: "http://+:8080"
+
+            - name: ConnectionStrings__Database
+              valueFrom:
+                secretKeyRef:
+                  name: fcg-dev-secrets
+                  key: library-connection-string
+
+            - name: Authentication__Authority
+              value: "http://identity-api:8080"
+
+            - name: Authentication__Issuer
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-config
+                  key: identity-issuer
+
+            - name: Authentication__Audience
+              value: "library-api"
+
+            - name: Authentication__RequireHttpsMetadata
+              value: "false"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: library-api
+  namespace: fcg
+spec:
+  type: ClusterIP
+  selector:
+    app: library-api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

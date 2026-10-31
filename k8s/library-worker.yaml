@@ -1,0 +1,47 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: library-worker
+  namespace: fcg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-worker
+  template:
+    metadata:
+      labels:
+        app: library-worker
+    spec:
+      containers:
+        - name: library-worker
+          image: fcg-library-worker:local
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DOTNET_ENVIRONMENT
+              value: Development
+
+            - name: ConnectionStrings__Database
+              valueFrom:
+                secretKeyRef:
+                  name: fcg-dev-secrets
+                  key: library-connection-string
+
+            - name: RabbitMq__Host
+              value: rabbitmq
+
+            - name: RabbitMq__Port
+              value: "5672"
+
+            - name: RabbitMq__Username
+              valueFrom:
+                secretKeyRef:
+                  name: fcg-dev-secrets
+                  key: rabbitmq-username
+
+            - name: RabbitMq__Password
+              valueFrom:
+                secretKeyRef:
+                  name: fcg-dev-secrets
+                  key: rabbitmq-password
