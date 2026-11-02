@@ -14,7 +14,7 @@ public sealed class ListUserLibraryService(
         CancellationToken cancellationToken)
     {
         if (input.Limit is < 1 or > 100)
-            throw AppException.Conflict("O limite deve estar entre 1 e 100.");
+            throw AppException.Validation("O limite deve estar entre 1 e 100.");
 
         var cursor = LibraryCursorCodec.Decode(input.Cursor);
 

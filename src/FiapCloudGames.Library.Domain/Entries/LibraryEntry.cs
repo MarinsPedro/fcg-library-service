@@ -4,7 +4,7 @@ namespace FiapCloudGames.Library.Domain.Entries;
 
 public sealed class LibraryEntry
 {
-    public LibraryEntry() { }
+    private LibraryEntry() { }
 
     private LibraryEntry(
         Guid id,

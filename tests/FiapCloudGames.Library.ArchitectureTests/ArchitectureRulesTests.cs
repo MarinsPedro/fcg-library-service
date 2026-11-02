@@ -79,9 +79,18 @@ public sealed class ArchitectureRulesTests
             "Domain",
             "Infrastructure",
             "Presentation",
-            "MassTransit",
             "Microsoft.AspNetCore",
             "Microsoft.EntityFrameworkCore");
+
+        var massTransitReferences = typeof(
+                FiapCloudGames.Library.Contracts.Events.V1.GameGrantRequestedEventV1)
+            .Assembly
+            .GetReferencedAssemblies()
+            .Select(reference => reference.Name ?? string.Empty)
+            .Where(name => name.StartsWith("MassTransit", StringComparison.Ordinal))
+            .ToArray();
+
+        Assert.Equal(["MassTransit.Abstractions"], massTransitReferences);
     }
 
     private static void AssertDoesNotReference(

@@ -1,9 +1,11 @@
+using MassTransit;
 
 namespace FiapCloudGames.Library.Contracts.Events.V1;
 
+[MessageUrn("GameGrantedEventV1", useDefaultPrefix: true)]
 public sealed record GameGrantedEventV1(
-    Guid LibraryEntryId,
+    Guid EventId,
     Guid OrderId,
     Guid UserId,
     Guid GameId,
-    DateTimeOffset GrantedAtUtc);
+    DateTimeOffset GrantedAtUtc) : IIntegrationEvent;

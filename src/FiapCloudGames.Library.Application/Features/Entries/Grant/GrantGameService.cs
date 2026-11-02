@@ -14,6 +14,9 @@ public sealed class GrantGameService(
         GrantGameInput input,
         CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(input);
+        Validate(input);
+
         logger.LogInformation(
             "Concedendo jogo para a biblioteca. OrderId={OrderId}, UserId={UserId}, GameId={GameId}.",
             input.OrderId,
@@ -65,5 +68,35 @@ public sealed class GrantGameService(
             entry.Id);
 
         return LibraryApplicationMappings.ToResult(entry);
+    }
+
+    private static void Validate(GrantGameInput input)
+    {
+        List<AppError> errors = [];
+
+        AddRequiredIdError(input.OrderId, "orderId", "O identificador do pedido é obrigatório.");
+        AddRequiredIdError(input.UserId, "userId", "O identificador do usuário é obrigatório.");
+        AddRequiredIdError(input.GameId, "gameId", "O identificador do jogo é obrigatório.");
+
+        if (input.GrantedAtUtc == default ||
+            input.GrantedAtUtc.Offset != TimeSpan.Zero)
+        {
+            errors.Add(new AppError(
+                "A data de concessão do jogo deve estar em UTC.",
+                "grantedAtUtc"));
+        }
+
+        if (errors.Count > 0)
+        {
+            throw AppException.Validation(errors);
+        }
+
+        void AddRequiredIdError(Guid value, string field, string message)
+        {
+            if (value == Guid.Empty)
+            {
+                errors.Add(new AppError(message, field));
+            }
+        }
     }
 }

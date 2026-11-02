@@ -36,7 +36,7 @@ internal static class LibraryCursorCodec
         catch (Exception exception) when (
             exception is FormatException or JsonException)
         {
-            throw AppException.Conflict("Cursor de paginacao invalido.");
+            throw AppException.Validation("Cursor de paginação inválido.");
         }
     }
 }
