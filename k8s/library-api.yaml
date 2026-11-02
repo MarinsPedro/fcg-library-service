@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: library-api
+  namespace: fcg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-api
+  template:
+    metadata:
+      labels:
+        app: library-api
+    spec:
+      containers:
+      - name: library-api
+        image: fcg-library-api:local
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ConnectionStrings__Database
+          valueFrom:
+            secretKeyRef:
+              name: fcg-dev-secrets
+              key: library-connection-string
+        envFrom:
+        - configMapRef:
+            name: fcg-library-api-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: library-api
+  namespace: fcg
+spec:
+  type: ClusterIP
+  selector:
+    app: library-api
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080

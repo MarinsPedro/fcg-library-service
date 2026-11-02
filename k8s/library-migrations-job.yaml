@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: library-migrations
+  namespace: fcg
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: migrations
+        image: fcg-library-migrations:local
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LIBRARY_MIGRATIONS_CONNECTION
+          valueFrom:
+            secretKeyRef:
+              name: fcg-dev-secrets
+              key: library-connection-string
+        envFrom:
+        - configMapRef:
+            name: fcg-library-migrations-config

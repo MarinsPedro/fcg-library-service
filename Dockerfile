@@ -5,13 +5,15 @@ WORKDIR /app
 EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /src
-COPY . .
+WORKDIR /workspace
+COPY --from=buildingblocks / /workspace/fcg-dotnet-building-blocks
+COPY . /workspace/fcg-library-service
+WORKDIR /workspace/fcg-library-service
 RUN --mount=type=secret,id=nuget_config,target=/root/.nuget/NuGet/NuGet.Config,required=true \
-    dotnet restore FiapCloudGames.Library.slnx --configfile /root/.nuget/NuGet/NuGet.Config
-RUN dotnet publish src/FiapCloudGames.Library.Api/FiapCloudGames.Library.Api.csproj -c Release --no-restore -o /app/api
-RUN dotnet publish src/FiapCloudGames.Library.Worker/FiapCloudGames.Library.Worker.csproj -c Release --no-restore -o /app/worker
-RUN dotnet publish src/FiapCloudGames.Library.Migrations/FiapCloudGames.Library.Migrations.csproj -c Release --no-restore -o /app/migrations
+    dotnet restore FiapCloudGames.Library.slnx -p:UseLocalBuildingBlocks=true --configfile /root/.nuget/NuGet/NuGet.Config
+RUN dotnet publish src/FiapCloudGames.Library.Api/FiapCloudGames.Library.Api.csproj -c Release -p:UseLocalBuildingBlocks=true --no-restore -o /app/api
+RUN dotnet publish src/FiapCloudGames.Library.Worker/FiapCloudGames.Library.Worker.csproj -c Release -p:UseLocalBuildingBlocks=true --no-restore -o /app/worker
+RUN dotnet publish src/FiapCloudGames.Library.Migrations/FiapCloudGames.Library.Migrations.csproj -c Release -p:UseLocalBuildingBlocks=true --no-restore -o /app/migrations
 
 FROM runtime AS migrations
 WORKDIR /app

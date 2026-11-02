@@ -10,10 +10,10 @@ Fluxo principal:
 
 ```text
 Orders --HTTP--> Library: usuario ja possui o jogo?
-
-Payments --PaymentPaidEvent--> Orders
-Orders --OrderCompletedEvent--> Library Worker
+Orders Saga --GameGrantRequestedEventV1--> Library Worker
 Library Worker --> cria LibraryEntry
+Library Worker --GameGrantedEventV1--> Orders Saga
+Orders Saga --OrderCompletedEventV1--> Notifications Worker
 ```
 
 ## Rotas HTTP
@@ -47,65 +47,34 @@ Scope: `library.games.read`.
 
 ## Mensageria
 
-O Library utiliza MassTransit com RabbitMQ e
-Entity Framework Consumer Outbox.
+O Library utiliza MassTransit com RabbitMQ e Entity Framework Consumer Outbox.
 
-### Entrada — Solicitação de concessão
+### Entrada - Solicitação de concessão
 
-Contrato: GameGrantRequestedEventV1
+- Contrato: `GameGrantRequestedEventV1`
+- Exchange: `library.game-grant-requested.v1` (fanout MassTransit)
+- Fila: `fcg-library-game-grant-requested`
+- Campos: `EventId`, `OrderId`, `UserId`, `GameId`, `OccurredAtUtc`
 
-Exchange: fcg.events
-Tipo: topic
-Routing key: library.game.grant.requested
-Fila: fcg.library.game-grant-requested
+O Worker recebe o evento, concede o jogo pelo `GrantGameService` e registra a operação de forma idempotente.
 
-Payload:
-- OrderId
-- UserId
-- GameId
-- OccurredAtUtc
+### Saída - Jogo concedido
 
-O Worker recebe o evento e solicita a concessão
-do jogo ao GrantGameService.
+- Contrato: `GameGrantedEventV1`
+- Exchange: `library.game-granted.v1` (fanout MassTransit)
+- Campos: `EventId`, `OrderId`, `UserId`, `GameId`, `GrantedAtUtc`
 
-### Saída — Jogo concedido
-
-Contrato: GameGrantedEventV1
-
-Exchange: fcg.library.events
-Tipo: topic
-Routing key: library.game.granted
-
-Payload:
-- LibraryEntryId
-- OrderId
-- UserId
-- GameId
-- GrantedAtUtc
-
-Após a concessão, o Library publica a confirmação
-para que Orders possa concluir o pedido.
-
-### Versionamento
-
-Os contratos estão em:
-
-FiapCloudGames.Library.Contracts.Events.V1
+Orders recebe a confirmação e prossegue com a saga. O MassTransit declara exchanges, filas e bindings automaticamente, sem Job de topologia externa ou routing keys manuais.
 
 ### Confiabilidade
 
 - Consumer Outbox com PostgreSQL
-- Controle de mensagens recebidas pelo MassTransit
 - Idempotência de negócio por OrderId
 - Unicidade de ownership por UserId e GameId
 - CorrelationId propagado quando disponível
 - Retry para falhas transitórias
 
-### Integração pendente
-
-Alinhar contratos, routing keys e bindings com Orders.
-Validar o fluxo com RabbitMQ e PostgreSQL.
-
+Os contratos V1 ficam em `FiapCloudGames.Library.Contracts.Events.V1`.
 
 ## Persistencia
 
