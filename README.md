@@ -104,6 +104,46 @@ library.outbox_message
 library.outbox_state
 ```
 
+## Variaveis de ambiente
+
+No ambiente do projeto os valores vem do orquestrador (`config/*-library-*.env` e Secrets); o `appsettings.json` do servico fica vazio. `__` equivale a `:` na configuracao do .NET.
+
+### API (`library-api`)
+
+| Variavel | Obrigatoria | Onde fica no cluster | Exemplo | Para que serve |
+|---|---|---|---|---|
+| `ConnectionStrings__Database` | sim | Secret (`fcg-dev-secrets`, `library-connection-string`) | `Host=postgres;Database=fcg_library;...` | Conexao com o PostgreSQL |
+| `Authentication__Authority` | sim | ConfigMap | `http://identity-api:8080` | Identity que valida os tokens |
+| `Authentication__Audience` | sim | ConfigMap | `library-api` | Audience aceita |
+| `Authentication__Issuer` | sim | ConfigMap | `fiap-cloud-games-identity` | Emissor esperado |
+| `Authentication__AllowedTokenUses__0` | sim | ConfigMap | `service` | So tokens de servico |
+| `Authentication__RequireHttpsMetadata` | nao | ConfigMap | `false` | `false` em ambiente local |
+| `ASPNETCORE_ENVIRONMENT`, `ASPNETCORE_URLS` | nao | ConfigMap | `Development`, `http://+:8080` | Ambiente e porta |
+
+A API nao usa RabbitMQ.
+
+### Worker (`library-worker`)
+
+| Variavel | Obrigatoria | Onde fica | Exemplo | Para que serve |
+|---|---|---|---|---|
+| `ConnectionStrings__Database` | sim | Secret | - | Banco, entradas da biblioteca e Outbox |
+| `RabbitMq__Host` | sim | ConfigMap | `rabbitmq` | Host do RabbitMQ |
+| `RabbitMq__Port`, `RabbitMq__VirtualHost` | nao | ConfigMap | `5672`, `/` | Porta e virtual host |
+| `RabbitMq__Username`, `RabbitMq__Password` | sim | Secret (`fcg-dev-secrets`) | - | Credenciais do broker |
+| `RabbitMq__Topology__Exchanges__GameGrantRequested` | sim | ConfigMap | `library.game-grant-requested.v1` | Exchange do pedido de concessao |
+| `RabbitMq__Topology__Exchanges__GameGranted` | sim | ConfigMap | `library.game-granted.v1` | Exchange do jogo concedido |
+| `RabbitMq__Topology__Queues__GameGrantRequested` | sim | ConfigMap | `fcg-library-game-grant-requested` | Fila de entrada |
+| `DOTNET_ENVIRONMENT` | nao | ConfigMap | `Development` | Ambiente do Worker |
+
+### Migrations (`library-migrations`)
+
+| Variavel | Obrigatoria | Onde fica | Para que serve |
+|---|---|---|---|
+| `ConnectionStrings__Database` | sim | Secret | Conexao usada para aplicar as migrations |
+| `DOTNET_ENVIRONMENT` | nao | ConfigMap | Ambiente do executavel |
+
+Os manifests em `k8s/` se chamam `library-api.yaml`, `library-worker.yaml` e `library-migrations-job.yaml`. ConfigMaps e Secrets sao criados pelo instalador do orquestrador (`fgc-orchestrator-service`, clonado como a pasta `fcg-orchestration`).
+
 ## Estrutura
 
 ```text
